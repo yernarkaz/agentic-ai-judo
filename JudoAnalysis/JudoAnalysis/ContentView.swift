@@ -1,86 +1,73 @@
-//
-//  ContentView.swift
-//  JudoAnalysis
-//
-//  Created by Yernar Smagulov on 27.01.2026.
-//
-
 import SwiftUI
-import CoreData
 
 struct ContentView: View {
-    @Environment(\.managedObjectContext) private var viewContext
-
-    @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Item.timestamp, ascending: true)],
-        animation: .default)
-    private var items: FetchedResults<Item>
-
+    @StateObject private var networkManager = NetworkManager()
+    @State private var showPicker = false
+    @State private var selectedVideoURL: URL?
+    
     var body: some View {
         NavigationView {
-            List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp!, formatter: itemFormatter)")
-                    } label: {
-                        Text(item.timestamp!, formatter: itemFormatter)
+            VStack(spacing: 20) {
+                if let result = networkManager.analysisResult {
+                    AnalysisView(result: result)
+                } else if networkManager.isUploading {
+                    VStack {
+                        ProgressView()
+                            .scaleEffect(1.5)
+                        Text("Analyzing Video... This may take a while.")
+                            .padding(.top)
                     }
-                }
-                .onDelete(perform: deleteItems)
-            }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
+                } else {
+                    VStack(spacing: 20) {
+                        Image(systemName: "figure.martial.arts")
+                            .font(.system(size: 100))
+                            .foregroundColor(.blue)
+                        
+                        Text("Judo Analysis Coach")
+                            .font(.largeTitle)
+                            .fontWeight(.bold)
+                            .multilineTextAlignment(.center)
+                        
+                        Text("Upload a video to get AI-driven technique analysis.")
+                            .font(.subheadline)
+                            .foregroundColor(.gray)
+                            .multilineTextAlignment(.center)
                     }
+                    .padding(.bottom, 50)
+                    
+                    Button(action: {
+                        showPicker = true
+                    }) {
+                        HStack {
+                            Image(systemName: "video.badge.plus")
+                            Text("Select Video")
+                        }
+                        .font(.headline)
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(12)
+                    }
+                    .padding(.horizontal, 40)
+                }
+
+                if let error = networkManager.errorMessage {
+                    Text(error)
+                        .foregroundColor(.red)
+                        .padding()
+                        .multilineTextAlignment(.center)
                 }
             }
-            Text("Select an item")
-        }
-    }
-
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(context: viewContext)
-            newItem.timestamp = Date()
-
-            do {
-                try viewContext.save()
-            } catch {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                let nsError = error as NSError
-                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+            .navigationTitle(networkManager.analysisResult == nil ? "Home" : "Results")
+            .sheet(isPresented: $showPicker) {
+                VideoPicker(videoURL: $selectedVideoURL)
+            }
+            .onChange(of: selectedVideoURL) { newUrl in
+                if let url = newUrl {
+                    networkManager.uploadVideo(at: url)
+                }
             }
         }
     }
-
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            offsets.map { items[$0] }.forEach(viewContext.delete)
-
-            do {
-                try viewContext.save()
-            } catch {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                let nsError = error as NSError
-                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-            }
-        }
-    }
-}
-
-private let itemFormatter: DateFormatter = {
-    let formatter = DateFormatter()
-    formatter.dateStyle = .short
-    formatter.timeStyle = .medium
-    return formatter
-}()
-
-#Preview {
-    ContentView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
 }
