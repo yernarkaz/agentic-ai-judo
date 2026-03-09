@@ -1,3 +1,9 @@
 venv
 .DS_Store
 data/
+.env
+config/.env
+output/
+__pycache__/
+*.pyc
+*.pyo

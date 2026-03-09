@@ -1,13 +1,22 @@
+"""
+Judo Analysis Pipeline — Main orchestrator.
+
+Processes judo match videos through:
+  1. Smart frame extraction (scene detection + motion scoring)
+  2. GPT-4o Vision multi-pass analysis
+  3. Structured output with text and JSON reports
+"""
+
 import os
+import json
 import logging
 from pathlib import Path
 from datetime import datetime
 from dotenv import load_dotenv
 
 from src.video_processing.frame_extractor import FrameExtractor
-from src.frame_captioning.caption_generator import FrameCaptioner
 from src.llm_analysis.judo_analyzer import JudoAnalyzer
-from src.utils.helpers import setup_directories, get_video_files
+from src.utils.helpers import setup_directories, get_video_files, load_config
 
 # Load environment variables
 load_dotenv()
@@ -25,12 +34,18 @@ class JudoAnalysisPipeline:
             workspace_dir: Base directory for the project
         """
         self.workspace_dir = workspace_dir
+        self.config = load_config()
         self.paths = setup_directories(workspace_dir)
 
-        # Initialize components
-        self.frame_extractor = FrameExtractor(fps=1)
-        self.captioner = FrameCaptioner()
-        self.analyzer = JudoAnalyzer()
+        # Initialize components with config
+        self.frame_extractor = FrameExtractor(
+            max_frames=self.config.get("max_frames", 50),
+            scene_change_threshold=self.config.get("scene_change_threshold", 30.0),
+            motion_threshold=self.config.get("motion_threshold", 15.0),
+        )
+        self.analyzer = JudoAnalyzer(
+            model=self.config.get("gpt_model", "gpt-4o"),
+        )
 
     def process_video(self, video_path: str) -> str:
         """
@@ -40,38 +55,52 @@ class JudoAnalysisPipeline:
             video_path: Path to the video file
 
         Returns:
-            Path to the analysis output file
+            Path to the analysis output directory
         """
         try:
-            # Create output directory for this video
             video_name = Path(video_path).stem
             video_output_dir = os.path.join(self.paths["frames"], video_name)
 
-            # Extract frames
-            logger.info(f"Extracting frames from {video_path}")
-            frame_paths = self.frame_extractor.extract_frames(
+            # Step 1: Extract key frames
+            logger.info(f"Step 1/2: Extracting key frames from {Path(video_path).name}")
+            frame_infos = self.frame_extractor.extract_frames(
                 video_path, video_output_dir
             )
 
-            # Generate captions
-            logger.info("Generating captions for frames")
-            captions = self.captioner.process_frames(frame_paths)
+            if not frame_infos:
+                raise ValueError("No frames were extracted from the video")
 
-            # Analyze sequence
-            logger.info("Analyzing judo sequence")
-            analysis = self.analyzer.analyze_sequence(captions)
+            # Compute video duration from last frame timestamp
+            duration_sec = max(f.timestamp_sec for f in frame_infos)
 
-            # Save analysis
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            analysis_path = os.path.join(
-                self.paths["analysis"], f"{video_name}_{timestamp}.txt"
+            # Step 2: Run GPT-4o Vision analysis
+            logger.info("Step 2/2: Running GPT-4o Vision analysis...")
+            analysis = self.analyzer.analyze_match(
+                frames=frame_infos,
+                video_filename=Path(video_path).name,
+                duration_sec=duration_sec,
             )
 
-            with open(analysis_path, "w") as f:
-                f.write(analysis)
+            # Save results
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            analysis_dir = os.path.join(self.paths["analysis"], video_name)
+            Path(analysis_dir).mkdir(parents=True, exist_ok=True)
 
-            logger.info(f"Analysis saved to {analysis_path}")
-            return analysis_path
+            # Save JSON report
+            json_path = os.path.join(analysis_dir, f"analysis_{timestamp}.json")
+            with open(json_path, "w") as f:
+                json.dump(analysis.to_dict(), f, indent=2)
+
+            # Save human-readable text report
+            text_path = os.path.join(analysis_dir, f"report_{timestamp}.txt")
+            with open(text_path, "w") as f:
+                f.write(analysis.to_text_report())
+
+            logger.info(f"Analysis saved:")
+            logger.info(f"  JSON: {json_path}")
+            logger.info(f"  Report: {text_path}")
+
+            return analysis_dir
 
         except Exception as e:
             logger.error(f"Error processing video {video_path}: {str(e)}")
@@ -85,32 +114,35 @@ class JudoAnalysisPipeline:
             data_dir: Directory containing video files
 
         Returns:
-            List of paths to analysis output files
+            List of paths to analysis output directories
         """
         video_files = get_video_files(data_dir)
-        analysis_files = []
+        logger.info(f"Found {len(video_files)} video(s) to process")
+
+        analysis_dirs = []
 
         for video_file in video_files:
             try:
-                analysis_path = self.process_video(video_file)
-                analysis_files.append(analysis_path)
+                analysis_dir = self.process_video(video_file)
+                analysis_dirs.append(analysis_dir)
             except Exception as e:
                 logger.error(f"Skipping {video_file} due to error: {str(e)}")
                 continue
 
-        return analysis_files
+        return analysis_dirs
 
 
 def main():
-    # Get the project root directory
-    workspace_dir = os.path.dirname(os.path.abspath(__file__))
-    data_dir = os.path.join(workspace_dir, "data")
+    """Run the pipeline on all videos in the data directory."""
+    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    data_dir = os.path.join(project_root, "data")
 
-    # Initialize and run pipeline
-    pipeline = JudoAnalysisPipeline(workspace_dir)
-    analysis_files = pipeline.process_all_videos(data_dir)
+    pipeline = JudoAnalysisPipeline(project_root)
+    analysis_dirs = pipeline.process_all_videos(data_dir)
 
-    logger.info(f"Processing complete. Generated {len(analysis_files)} analysis files.")
+    logger.info(
+        f"Processing complete. Generated {len(analysis_dirs)} analysis report(s)."
+    )
 
 
 if __name__ == "__main__":
