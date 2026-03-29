@@ -1,0 +1,46 @@
+[
+  {
+    "name": "Seoi Nage",
+    "category": "Throwing",
+    "description": "Shoulder throw",
+    "features": {
+      "elbow_angles": {"left": 90, "right": 90},
+      "knee_angles": {"left": 120, "right": 120},
+      "hip_angles": {"left": 90, "right": 90},
+      "torso_tilt": 45
+    }
+  },
+  {
+    "name": "O Soto Gari",
+    "category": "Throwing",
+    "description": "Major outer reap",
+    "features": {
+      "elbow_angles": {"left": 120, "right": 120},
+      "knee_angles": {"left": 150, "right": 150},
+      "hip_angles": {"left": 60, "right": 60},
+      "torso_tilt": 30
+    }
+  },
+  {
+    "name": "Uchi Mata",
+    "category": "Throwing",
+    "description": "Inner thigh throw",
+    "features": {
+      "elbow_angles": {"left": 100, "right": 100},
+      "knee_angles": {"left": 130, "right": 130},
+      "hip_angles": {"left": 80, "right": 80},
+      "torso_tilt": 60
+    }
+  },
+  {
+    "name": "Harai Goshi",
+    "category": "Throwing",
+    "description": "Sweeping hip throw",
+    "features": {
+      "elbow_angles": {"left": 110, "right": 110},
+      "knee_angles": {"left": 140, "right": 140},
+      "hip_angles": {"left": 70, "right": 70},
+      "torso_tilt": 50
+    }
+  }
+]
