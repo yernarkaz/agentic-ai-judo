@@ -19,7 +19,8 @@ from src.llm_analysis.judo_analyzer import JudoAnalyzer
 from src.utils.helpers import setup_directories, get_video_files, load_config
 
 # Load environment variables
-load_dotenv()
+load_dotenv("config/.env")
+load_dotenv(override=False)
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

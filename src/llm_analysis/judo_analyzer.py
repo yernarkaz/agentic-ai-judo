@@ -24,7 +24,8 @@ from src.models.schemas import (
     StrategicInsight,
 )
 
-load_dotenv()
+load_dotenv("config/.env")
+load_dotenv(override=False)
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

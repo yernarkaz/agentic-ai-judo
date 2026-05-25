@@ -12,11 +12,13 @@ logger = logging.getLogger(__name__)
 def load_config() -> dict:
     """
     Load configuration from .env file.
+    Checks both project root .env and config/.env as fallback.
 
     Returns:
         Dictionary with configuration values
     """
-    load_dotenv()
+    load_dotenv("config/.env")  # load real config first
+    load_dotenv(override=False)  # root .env only fills gaps
     return {
         "max_frames": int(os.getenv("FRAME_EXTRACTION_MAX_FRAMES", "50")),
         "scene_change_threshold": float(os.getenv("SCENE_CHANGE_THRESHOLD", "30")),

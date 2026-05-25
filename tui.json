@@ -1,0 +1,7 @@
+{
+    "tui": {
+        "scroll_acceleration": {
+            "enabled": true
+        }
+    }
+}
