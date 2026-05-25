@@ -51,30 +51,25 @@ def extract_contests_from_profile(session: requests.Session) -> list[dict]:
 
     html = response.text
 
-    # Extract contest codes
-    contest_pattern = r"contests/([a-z0-9_]+)"
-    contest_codes = list(set(re.findall(contest_pattern, html)))
+    # Extract full contest URLs from the profile page
+    # Pattern: /competitions/{comp_code}/contests/{contest_code}
+    url_pattern = r"/competitions/([a-z0-9_]+)/contests/([a-z0-9_]+)"
+    matches = re.findall(url_pattern, html)
 
-    # Extract competition codes for URL construction
-    comp_pattern = r"competitions/([a-z0-9_]+)"
-    comp_codes = list(set(re.findall(comp_pattern, html)))
-
+    # Deduplicate by contest code, keep first occurrence
+    seen = set()
     contests = []
-    for code in sorted(contest_codes):
-        # Derive competition code from contest code
-        # e.g., cont_open_esp2026_0001_m_0060_0023 -> cont_open_esp2026
-        parts = code.split("_")
-        if len(parts) >= 3:
-            comp_code = "_".join(parts[:3])
-        else:
-            comp_code = parts[0]
+    for comp_code, contest_code in matches:
+        if contest_code not in seen:
+            seen.add(contest_code)
+            contests.append({
+                "contest_code": contest_code,
+                "competition_code": comp_code,
+                "url": f"https://judotv.com/competitions/{comp_code}/contests/{contest_code}",
+            })
 
-        contests.append({
-            "contest_code": code,
-            "competition_code": comp_code,
-            "url": f"https://judotv.com/competitions/{comp_code}/contests/{code}",
-        })
-
+    # Sort by contest code
+    contests.sort(key=lambda c: c["contest_code"])
     return contests
 
 
