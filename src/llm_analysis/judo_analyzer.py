@@ -8,12 +8,13 @@ Multi-pass analysis:
 """
 
 import os
+import time
 import base64
 import json
 import logging
 from pathlib import Path
 from typing import List, Dict, Any, Optional
-from openai import OpenAI
+import requests
 from dotenv import load_dotenv
 
 from src.video_processing.frame_extractor import FrameInfo
@@ -33,85 +34,49 @@ logger = logging.getLogger(__name__)
 
 # ── Prompt Templates ──────────────────────────────────────────────
 
-MOMENT_DETECTION_PROMPT = """You are an expert judo analyst with deep knowledge of competitive judo.
+MOMENT_DETECTION_PROMPT = """You are a judo analyst. Identify key moments from these frames.
 
-You are analyzing frames extracted from a judo match video. Each frame is labeled with its timestamp.
-
-Analyze all the frames and identify the KEY MOMENTS in this match. Focus on:
-1. **Grip fighting** (kumi-kata) — when athletes are establishing or fighting for grips
-2. **Attack attempts** — any throwing or takedown attempts
-3. **Defensive actions** — sprawls, blocks, counters
-4. **Groundwork** (ne-waza) — any time the athletes go to the ground
-5. **Transitions** — standing to ground or vice versa
-6. **Resets** — when the referee stops and restarts the action
-
-For each key moment, provide:
-- start_timestamp and end_timestamp (in seconds, from the frame labels)
-- moment_type: one of "grip_fight", "attack", "defense", "groundwork", "transition", "standing", "reset"
-- description: what is happening in this moment
-- frame_indices: which frame numbers (0-indexed) correspond to this moment
-
-Respond ONLY with valid JSON in this exact format:
+For each moment found, return JSON:
 {
   "moments": [
     {
       "start_timestamp": 0.0,
       "end_timestamp": 5.0,
-      "moment_type": "grip_fight",
-      "description": "Both athletes are fighting for right-hand collar grip",
+      "moment_type": "attack",
+      "description": "what is happening",
       "frame_indices": [0, 1, 2]
     }
   ]
-}"""
+}
+
+moment_type must be one of: grip_fight, attack, defense, groundwork, transition, standing, reset
+frame_indices are the image numbers (0 = first image, 1 = second, etc.)
+Respond with JSON only, no other text."""
 
 
-TECHNIQUE_ANALYSIS_PROMPT = """You are a world-class judo coach and biomechanics expert analyzing a judo technique.
+TECHNIQUE_ANALYSIS_PROMPT = """You are a world-class judo coach analyzing a judo technique.
 
-Context: This sequence of frames shows a specific judo moment described as: "{moment_description}"
+Context: moment described as "{moment_description}"
 Time range: {start_time}s - {end_time}s
 
-Analyze the technique shown in these frames with extreme detail. Provide:
-
-1. **Technique identification**: Name the technique (both English and Japanese). Classify it (nage_waza, katame_waza, osaekomi_waza, shime_waza, kansetsu_waza).
-
-2. **Execution ratings** (1-10 scale):
-   - kuzushi_rating: How well was balance broken?
-   - tsukuri_rating: How well was the entry/fitting?
-   - kake_rating: How well was the throw/technique executed?
-   - execution_score: Overall execution quality
-
-3. **Score assessment**: Would this score ippon, waza_ari, or no_score under current IJF rules? Why?
-
-4. **Biomechanics**: Detailed observations about body positioning, hip placement, foot placement, grip positions, weight distribution, and posture.
-
-5. **Strengths**: What was done well (list specific items)
-
-6. **Improvements**: Specific, actionable corrections the athlete should make (list specific items)
-
-7. **Drill recommendations**: Training drills that would help improve this specific technique
-
-If the frames do NOT show a clear judo technique (e.g., just standing, walking, or the camera angle is bad), set the technique name to "No clear technique" and provide minimal ratings.
-
-Respond ONLY with valid JSON:
-{
-  "name": "Shoulder Throw",
-  "japanese_name": "Seoi Nage",
+Analyze the technique. Respond ONLY with valid JSON:
+{{
+  "name": "technique name",
+  "japanese_name": "Japanese name",
   "category": "nage_waza",
   "execution_score": 7,
   "kuzushi_rating": 8,
   "tsukuri_rating": 6,
   "kake_rating": 7,
-  "score_result": "waza_ari",
-  "biomechanics_notes": "Good hip entry but...",
-  "strengths": ["Strong initial pull", "Good timing"],
-  "improvements": ["Lower hip position needed", "Keep pulling hand active"],
-  "drill_recommendations": ["Band-assisted seoi nage entries", "Hip rotation drills"]
-}"""
+  "score_result": "no_score",
+  "biomechanics_notes": "observations",
+  "strengths": ["good thing"],
+  "improvements": ["fix this"],
+  "drill_recommendations": ["drill"]
+}}"""
 
 
-MATCH_SUMMARY_PROMPT = """You are an elite judo coach preparing a post-match analysis report for a professional judo athlete.
-
-You have the following data from analyzing the match:
+MATCH_SUMMARY_PROMPT = """You are an elite judo coach. Generate a match summary from the data below.
 
 **Detected moments:**
 {moments_json}
@@ -119,97 +84,94 @@ You have the following data from analyzing the match:
 **Technique analyses:**
 {techniques_json}
 
-Based on this data, provide a comprehensive match summary with:
-
-1. **overall_assessment**: A 3-5 sentence narrative summary of the match performance
-2. **score_summary**: Summary of scoring (e.g., "Player scored 1 waza-ari from seoi nage, attempted 3 attacks total")
-3. **dominant_techniques**: List of the player's most used/effective techniques
-4. **strengths**: Top strengths demonstrated in this match
-5. **weaknesses**: Key weaknesses observed
-6. **strategic_insights**: List of strategic observations, each with:
-   - category (e.g., "grip_strategy", "attack_pattern", "defense", "conditioning", "timing")
-   - observation: what was noticed
-   - recommendation: what to change
-7. **priority_improvements**: Top 3-5 most important things to work on (ranked)
-8. **recommended_drills**: Specific training drills and exercises
-9. **conditioning_notes**: Physical conditioning observations and recommendations
-
 Respond ONLY with valid JSON:
-{
-  "overall_assessment": "...",
-  "score_summary": "...",
-  "dominant_techniques": ["Seoi Nage", "Osoto Gari"],
-  "strengths": ["..."],
-  "weaknesses": ["..."],
-  "strategic_insights": [
-    {"category": "grip_strategy", "observation": "...", "recommendation": "..."}
-  ],
-  "priority_improvements": ["..."],
-  "recommended_drills": ["..."],
-  "conditioning_notes": "..."
-}"""
+{{
+  "overall_assessment": "summary",
+  "score_summary": "scoring summary",
+  "dominant_techniques": ["tech1"],
+  "strengths": ["s1"],
+  "weaknesses": ["w1"],
+  "strategic_insights": [{{"category": "grip_strategy", "observation": "...", "recommendation": "..."}}],
+  "priority_improvements": ["fix1"],
+  "recommended_drills": ["drill1"],
+  "conditioning_notes": "notes"
+}}"""
 
 
 class JudoAnalyzer:
-    def __init__(self, api_key: str = None, model: str = None):
+    def __init__(self, model: str = None, base_url: str = None):
         """
-        Initialize the Judo Analyzer with GPT-4o Vision.
+        Initialize the Judo Analyzer with Ollama (local qwen2.5vl).
 
         Args:
-            api_key: OpenAI API key (uses env var if not provided)
-            model: Model name (defaults to GPT_MODEL env var or gpt-4o)
+            model: Ollama model name (defaults to OLLAMA_MODEL env var or qwen2.5vl:7b)
+            base_url: Ollama base URL (defaults to OLLAMA_BASE_URL env var)
         """
-        self.api_key = api_key or os.getenv("OPENAI_API_KEY")
-        if not self.api_key:
-            raise ValueError(
-                "OpenAI API key required. Set OPENAI_API_KEY in .env or pass api_key."
-            )
+        self.base_url = (base_url or os.getenv("OLLAMA_BASE_URL", "http://127.0.0.1:11434")).rstrip("/")
+        self.model = model or os.getenv("OLLAMA_MODEL", "qwen2.5vl:7b")
+        logger.info(f"JudoAnalyzer initialized with Ollama model: {self.model} @ {self.base_url}")
 
-        self.model = model or os.getenv("GPT_MODEL", "gpt-4o")
-        self.client = OpenAI(api_key=self.api_key)
-        logger.info(f"JudoAnalyzer initialized with model: {self.model}")
+    def _encode_image(self, image_path: str, max_dim: int = 512) -> str:
+        """Encode image to base64, resized to reduce VRAM usage."""
+        from PIL import Image
+        import io
 
-    def _encode_image(self, image_path: str) -> str:
-        """Encode image to base64 for the Vision API."""
-        with open(image_path, "rb") as f:
-            return base64.b64encode(f.read()).decode("utf-8")
+        img = Image.open(image_path)
+        if max(img.size) > max_dim:
+            img.thumbnail((max_dim, max_dim), Image.Resampling.LANCZOS)
+        buf = io.BytesIO()
+        img.save(buf, format="JPEG", quality=70)
+        return base64.b64encode(buf.getvalue()).decode("utf-8")
 
     def _build_vision_messages(
         self, system_prompt: str, frames: List[FrameInfo], user_text: str = ""
     ) -> List[Dict]:
-        """Build messages with images for the Vision API."""
-        content = []
+        """Build messages with images for Ollama Vision API."""
+        # Ollama expects: content as text, images as separate base64 array
+        text_parts = []
+        images = []
 
         if user_text:
-            content.append({"type": "text", "text": user_text})
+            text_parts.append(user_text)
 
-        for frame in frames:
-            b64 = self._encode_image(frame.path)
-            content.append({"type": "text", "text": f"[Frame at {frame.timestamp_sec}s]"})
-            content.append({
-                "type": "image_url",
-                "image_url": {
-                    "url": f"data:image/jpeg;base64,{b64}",
-                    "detail": "high",
-                },
-            })
+        for i, frame in enumerate(frames):
+            text_parts.append(f"[Image {i} - Frame at {frame.timestamp_sec:.1f}s]")
+            images.append(self._encode_image(frame.path))
 
         return [
             {"role": "system", "content": system_prompt},
-            {"role": "user", "content": content},
+            {"role": "user", "content": "\n".join(text_parts), "images": images},
         ]
 
     def _call_vision(
-        self, messages: List[Dict], max_tokens: int = 2000
+        self, messages: List[Dict], max_tokens: int = 2000, max_retries: int = 5
     ) -> str:
-        """Call the GPT-4o Vision API and return the text response."""
-        response = self.client.chat.completions.create(
-            model=self.model,
-            messages=messages,
-            max_tokens=max_tokens,
-            temperature=0.3,  # Lower temperature for more consistent analysis
-        )
-        return response.choices[0].message.content
+        """Call Ollama chat API with exponential backoff retry."""
+        for attempt in range(max_retries):
+            try:
+                response = requests.post(
+                    f"{self.base_url}/api/chat",
+                    json={
+                        "model": self.model,
+                        "messages": messages,
+                        "options": {
+                            "num_predict": max_tokens,
+                            "temperature": 0.3,
+                        },
+                        "stream": False,
+                    },
+                    timeout=300,
+                )
+                response.raise_for_status()
+                return response.json()["message"]["content"]
+            except requests.exceptions.RequestException as e:
+                if attempt < max_retries - 1:
+                    wait = min(2 ** attempt * 5, 300)
+                    logger.warning(f"Request failed: {e} (attempt {attempt+1}/{max_retries}). Retrying in {wait}s...")
+                    time.sleep(wait)
+                else:
+                    raise
+        raise RuntimeError(f"Ollama API failed after {max_retries} retries")
 
     def _parse_json_response(self, text: str) -> Dict:
         """Extract and parse JSON from the model response."""
@@ -246,8 +208,8 @@ class JudoAnalyzer:
         """
         logger.info(f"Pass 1: Detecting moments from {len(frames)} frames...")
 
-        # Send frames in batches of ~15 to avoid token limits
-        batch_size = 15
+        # Send frames in small batches - qwen2.5vl handles ~5 images max per request
+        batch_size = 5
         all_moments = []
 
         for i in range(0, len(frames), batch_size):
@@ -263,16 +225,27 @@ class JudoAnalyzer:
 
             response_text = self._call_vision(messages, max_tokens=2000)
             data = self._parse_json_response(response_text)
+            # Model may return list directly instead of {"moments": [...]}
+            if isinstance(data, list):
+                moments_list = data
+            else:
+                moments_list = data.get("moments", [])
 
-            for m in data.get("moments", []):
-                moment = MatchMoment(
-                    timestamp_start=m["start_timestamp"],
-                    timestamp_end=m["end_timestamp"],
-                    moment_type=m["moment_type"],
-                    description=m["description"],
-                    frame_indices=[idx + i for idx in m.get("frame_indices", [])],
-                )
-                all_moments.append(moment)
+            for m in moments_list:
+                if not isinstance(m, dict):
+                    continue
+                try:
+                    moment = MatchMoment(
+                        timestamp_start=m.get("start_timestamp", 0),
+                        timestamp_end=m.get("end_timestamp", 0),
+                        moment_type=m.get("moment_type", "standing"),
+                        description=m.get("description", ""),
+                        frame_indices=[idx + i for idx in m.get("frame_indices", [])],
+                    )
+                    all_moments.append(moment)
+                except (TypeError, KeyError):
+                    logger.warning(f"  Skipping malformed moment: {m}")
+                    continue
 
         logger.info(f"  Detected {len(all_moments)} moments")
         return all_moments
@@ -328,6 +301,8 @@ class JudoAnalyzer:
             messages = self._build_vision_messages(prompt, relevant_frames)
             response_text = self._call_vision(messages, max_tokens=1500)
             data = self._parse_json_response(response_text)
+            if isinstance(data, list):
+                data = data[0] if data else {}
 
             tech = TechniqueAnalysis(
                 name=data.get("name", "Unknown"),
@@ -375,17 +350,24 @@ class JudoAnalyzer:
             techniques_json=json.dumps(techniques_data, indent=2),
         )
 
-        response = self.client.chat.completions.create(
-            model=self.model,
-            messages=[
-                {"role": "system", "content": "You are an elite judo coach."},
-                {"role": "user", "content": prompt},
-            ],
-            max_tokens=2000,
-            temperature=0.4,
+        response = requests.post(
+            f"{self.base_url}/api/chat",
+            json={
+                "model": self.model,
+                "messages": [
+                    {"role": "system", "content": "You are an elite judo coach."},
+                    {"role": "user", "content": prompt},
+                ],
+                "options": {
+                    "num_predict": 2000,
+                    "temperature": 0.4,
+                },
+                "stream": False,
+            },
+            timeout=300,
         )
-
-        data = self._parse_json_response(response.choices[0].message.content)
+        response.raise_for_status()
+        data = self._parse_json_response(response.json()["message"]["content"])
 
         # Build strategic insights
         insights = []

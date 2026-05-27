@@ -243,6 +243,32 @@ def main():
         print(f"\n{'='*60}")
         print(f"Downloaded: {downloaded}/{len(available)}")
         print(f"{'='*60}")
+
+        # Generate metadata JSON
+        metadata = {
+            "judoka": {
+                "id": JUDOKA_ID,
+                "name": JUDOKA_NAME,
+                "weight_class": "-60kg",
+            },
+            "download_date": __import__("datetime").datetime.now().strftime("%Y-%m-%d"),
+            "total_contests": len(available),
+            "contests": [],
+        }
+        for vid in available:
+            opponent = vid["title"].replace("Aldiyar KARGULOV", "").replace("vs.", "").strip()
+            comp = vid["contest_code"].split("_")[0]
+            metadata["contests"].append({
+                "contest_code": vid["contest_code"],
+                "title": vid["title"],
+                "opponent": opponent,
+                "competition": comp,
+                "video_file": f"{vid['contest_code']}.mp4",
+            })
+        meta_path = os.path.join(args.output, "contest_metadata.json")
+        with open(meta_path, "w") as f:
+            json.dump(metadata, f, indent=2)
+        print(f"\nMetadata saved: {meta_path}")
     else:
         print("\nUse --download flag to download videos.")
         print("Example: python3 scripts/judotv_downloader.py --download --quality 720")

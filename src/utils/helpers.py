@@ -23,7 +23,8 @@ def load_config() -> dict:
         "max_frames": int(os.getenv("FRAME_EXTRACTION_MAX_FRAMES", "50")),
         "scene_change_threshold": float(os.getenv("SCENE_CHANGE_THRESHOLD", "30")),
         "motion_threshold": float(os.getenv("MOTION_THRESHOLD", "15")),
-        "gpt_model": os.getenv("GPT_MODEL", "gpt-4o"),
+        "ollama_model": os.getenv("OLLAMA_MODEL", "qwen2.5vl:7b"),
+        "ollama_base_url": os.getenv("OLLAMA_BASE_URL", "http://127.0.0.1:11434"),
         "output_dir": os.getenv("OUTPUT_DIR", "output"),
     }
 
@@ -47,15 +48,16 @@ def setup_directories(base_path: str) -> dict:
 
 
 def get_video_files(data_dir: str) -> list:
-    """Get all video files from the data directory."""
+    """Get all video files from the data directory (recursive)."""
     video_extensions = (".mp4", ".mov", ".avi")
     if not os.path.exists(data_dir):
         return []
-    return [
-        os.path.join(data_dir, f)
-        for f in os.listdir(data_dir)
-        if f.lower().endswith(video_extensions)
-    ]
+    result = []
+    for root, _dirs, files in os.walk(data_dir):
+        for f in files:
+            if f.lower().endswith(video_extensions):
+                result.append(os.path.join(root, f))
+    return sorted(result)
 
 
 def format_timestamp(seconds: float) -> str:

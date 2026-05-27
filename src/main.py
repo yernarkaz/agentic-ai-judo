@@ -3,7 +3,7 @@ Judo Analysis Pipeline — Main orchestrator.
 
 Processes judo match videos through:
   1. Smart frame extraction (scene detection + motion scoring)
-  2. GPT-4o Vision multi-pass analysis
+  2. Ollama (qwen2.5vl) multi-pass vision analysis
   3. Structured output with text and JSON reports
 """
 
@@ -45,7 +45,8 @@ class JudoAnalysisPipeline:
             motion_threshold=self.config.get("motion_threshold", 15.0),
         )
         self.analyzer = JudoAnalyzer(
-            model=self.config.get("gpt_model", "gpt-4o"),
+            model=self.config.get("ollama_model", "qwen2.5vl:7b"),
+            base_url=self.config.get("ollama_base_url", "http://127.0.0.1:11434"),
         )
 
     def process_video(self, video_path: str) -> str:
@@ -75,7 +76,7 @@ class JudoAnalysisPipeline:
             duration_sec = max(f.timestamp_sec for f in frame_infos)
 
             # Step 2: Run GPT-4o Vision analysis
-            logger.info("Step 2/2: Running GPT-4o Vision analysis...")
+            logger.info("Step 2/2: Running Ollama vision analysis...")
             analysis = self.analyzer.analyze_match(
                 frames=frame_infos,
                 video_filename=Path(video_path).name,
