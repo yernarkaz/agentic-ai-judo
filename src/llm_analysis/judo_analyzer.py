@@ -173,12 +173,10 @@ class JudoAnalyzer:
                     raise
         raise RuntimeError(f"Ollama API failed after {max_retries} retries")
 
-    def _parse_json_response(self, text: str) -> Dict:
-        """Extract and parse JSON from the model response."""
-        # Try to find JSON in the response (handle markdown code blocks)
+    def _parse_json_response(self, text: str, expected_key: str = "moments") -> Dict:
+        """Extract and parse JSON from the model response. Handles truncated/ malformed output."""
         text = text.strip()
         if text.startswith("```"):
-            # Remove markdown code block
             lines = text.split("\n")
             text = "\n".join(lines[1:-1]) if lines[-1].strip() == "```" else "\n".join(lines[1:])
             text = text.strip()
@@ -187,7 +185,6 @@ class JudoAnalyzer:
             return json.loads(text)
         except json.JSONDecodeError as e:
             logger.warning(f"Failed to parse JSON response: {e}")
-            logger.debug(f"Raw response: {text[:500]}")
             # Try to find JSON object in the text
             start = text.find("{")
             end = text.rfind("}") + 1
@@ -196,6 +193,25 @@ class JudoAnalyzer:
                     return json.loads(text[start:end])
                 except json.JSONDecodeError:
                     pass
+            # Last resort: salvage partial JSON by finding the key and truncating to last complete entry
+            key_pos = text.find(f'"{expected_key}"')
+            if key_pos >= 0:
+                brace_start = text.find("[", max(0, key_pos - 30))
+                if brace_start < 0:
+                    brace_start = text.find("{", max(0, key_pos - 30))
+                if brace_start >= 0:
+                    # Find all complete JSON objects/arrays up to last balanced "}"
+                    # Walk backwards from end, finding last complete object
+                    for end_pos in range(len(text), brace_start + 200, -1):
+                        candidate = text[brace_start:end_pos].strip()
+                        if candidate.endswith("}"):
+                            # Fix trailing commas before closing braces
+                            import re
+                            candidate = re.sub(r',\s*([}\]])', r'\1', candidate)
+                            try:
+                                return json.loads(candidate)
+                            except json.JSONDecodeError:
+                                continue
             raise ValueError(f"Could not parse JSON from model response: {text[:200]}")
 
     # ── Pass 1: Moment Detection ──────────────────────────────────
@@ -223,7 +239,7 @@ class JudoAnalyzer:
                 f"Analyzing {batch_label} of the match.",
             )
 
-            response_text = self._call_vision(messages, max_tokens=2000)
+            response_text = self._call_vision(messages, max_tokens=4096)
             data = self._parse_json_response(response_text)
             # Model may return list directly instead of {"moments": [...]}
             if isinstance(data, list):
@@ -342,32 +358,33 @@ class JudoAnalyzer:
 
         import dataclasses
 
-        moments_data = [dataclasses.asdict(m) for m in moments]
-        techniques_data = [dataclasses.asdict(t) for t in techniques]
+        # Truncate to avoid context overflow — keep only essential fields
+        moments_summary = [
+            {"ts": m.timestamp_start, "type": m.moment_type, "desc": m.description[:100]}
+            for m in moments
+        ]
+        # Limit to top 15 techniques to fit context window
+        tech_summary = []
+        for t in techniques[:15]:
+            tech_summary.append({
+                "name": t.name, "jp": t.japanese_name, "cat": t.category,
+                "exec": t.execution_score, "kuzushi": t.kuzushi_rating,
+                "result": t.score_result,
+                "strengths": t.strengths[:2], "improvements": t.improvements[:2],
+            })
 
         prompt = MATCH_SUMMARY_PROMPT.format(
-            moments_json=json.dumps(moments_data, indent=2),
-            techniques_json=json.dumps(techniques_data, indent=2),
+            moments_json=json.dumps(moments_summary, indent=2),
+            techniques_json=json.dumps(tech_summary, indent=2),
         )
 
-        response = requests.post(
-            f"{self.base_url}/api/chat",
-            json={
-                "model": self.model,
-                "messages": [
-                    {"role": "system", "content": "You are an elite judo coach."},
-                    {"role": "user", "content": prompt},
-                ],
-                "options": {
-                    "num_predict": 2000,
-                    "temperature": 0.4,
-                },
-                "stream": False,
-            },
-            timeout=300,
-        )
-        response.raise_for_status()
-        data = self._parse_json_response(response.json()["message"]["content"])
+        # Use retry wrapper instead of raw requests
+        messages = [
+            {"role": "system", "content": "You are an elite judo coach."},
+            {"role": "user", "content": prompt},
+        ]
+        response_text = self._call_vision(messages, max_tokens=2000, max_retries=5)
+        data = self._parse_json_response(response_text)
 
         # Build strategic insights
         insights = []

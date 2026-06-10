@@ -1,0 +1,56 @@
+- generic [ref=e2]:
+  - generic [ref=e4]:
+    - generic [ref=e6]: IJF ACCOUNT
+    - generic [ref=e7]: Log in
+    - generic [ref=e9]:
+      - textbox "Your email address" [ref=e10]
+      - textbox "Your password" [ref=e12]
+      - button "Log in" [ref=e14] [cursor=pointer]
+    - generic [ref=e18]: OR
+    - button "Continue with Google" [ref=e20] [cursor=pointer]: Continue with Google
+    - button "Continue with Apple" [ref=e24] [cursor=pointer]:
+      - generic [ref=e25]:
+        - img:
+          - generic:
+            - img:
+              - generic:  Continue with Apple
+      - img [ref=e27]
+    - generic [ref=e30]:
+      - generic [ref=e31]:
+        - generic [ref=e32]: New here?
+        - link "Register →" [ref=e34] [cursor=pointer]:
+          - /url: /Account/Register?backTo=https%3A%2F%2Fjudotv.com%2Fapi%2Fauth%2Fexternal&rnd=9705499
+      - generic [ref=e35]:
+        - generic [ref=e36]: Forgotten password?
+        - link "Manage →" [ref=e38] [cursor=pointer]:
+          - /url: /Account/ForgotPassword
+  - generic [ref=e39]:
+    - generic [ref=e40]: One account, many possibilities
+    - generic [ref=e44]:
+      - text: Loading IJF Products
+      - img [ref=e46]
+    - generic [ref=e51]: Our partners
+    - generic [ref=e55]:
+      - text: Loading IJF Sponsors
+      - img [ref=e57]
+  - generic [ref=e61]:
+    - generic [ref=e63]:
+      - text: © 2007-2026
+      - text: International Judo Federation
+      - text: All rights reserved
+    - table [ref=e65]:
+      - rowgroup [ref=e66]:
+        - row "Cookie settings Terms & Condititons" [ref=e67]:
+          - cell "Cookie settings" [ref=e68]:
+            - link "Cookie settings" [ref=e69] [cursor=pointer]:
+              - /url: https://www.ijf.org/cookies
+          - cell "Terms & Condititons" [ref=e70]:
+            - link "Terms & Condititons" [ref=e71] [cursor=pointer]:
+              - /url: https://www.ijf.org/page/legal
+        - row "Privacy policy How to use judo tv" [ref=e72]:
+          - cell "Privacy policy" [ref=e73]:
+            - link "Privacy policy" [ref=e74] [cursor=pointer]:
+              - /url: https://www.ijf.org/page/legal
+          - cell "How to use judo tv" [ref=e75]:
+            - link "How to use judo tv" [ref=e76] [cursor=pointer]:
+              - /url: "#"

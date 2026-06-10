@@ -1,0 +1,497 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - img [ref=e4]
+    - img [ref=e5]
+    - generic [ref=e6]:
+      - generic [ref=e7]:
+        - banner [ref=e8]:
+          - generic [ref=e9]:
+            - generic [ref=e10]:
+              - button [ref=e11] [cursor=pointer]:
+                - img [ref=e12]
+              - button [ref=e15] [cursor=pointer]:
+                - img [ref=e17]
+              - complementary
+            - navigation [ref=e21]:
+              - generic [ref=e22]:
+                - link "Overview" [ref=e23] [cursor=pointer]:
+                  - /url: /competitions/cont_open_esp2026/overview
+                  - button "Overview" [ref=e24]:
+                    - generic [ref=e26]: Overview
+                - button "Live" [disabled] [ref=e28]:
+                  - generic [ref=e30]: Live
+                - link "Draw" [ref=e31] [cursor=pointer]:
+                  - /url: /competitions/cont_open_esp2026/draw
+                  - button "Draw" [ref=e32]:
+                    - generic [ref=e34]: Draw
+                - link "Contest order" [ref=e35] [cursor=pointer]:
+                  - /url: /competitions/cont_open_esp2026/order
+                  - button "Contest order" [ref=e36]:
+                    - generic [ref=e38]: Contest order
+                - link "Judoka" [ref=e39] [cursor=pointer]:
+                  - /url: /competitions/cont_open_esp2026/judoka
+                  - button "Judoka" [ref=e40]:
+                    - img [ref=e41]
+                    - generic [ref=e44]: Judoka
+                - link "Results" [ref=e45] [cursor=pointer]:
+                  - /url: /competitions/cont_open_esp2026/results
+                  - button "Results" [ref=e46]:
+                    - generic [ref=e48]: Results
+                - link "Prediction League" [ref=e49] [cursor=pointer]:
+                  - /url: /competitions/cont_open_esp2026/prediction
+                  - button "Prediction League" [ref=e50]:
+                    - img [ref=e51]
+                    - generic [ref=e55]: Prediction League
+        - main [ref=e56]:
+          - generic [ref=e58]:
+            - generic [ref=e60]:
+              - generic [ref=e62]:
+                - time [ref=e63]: May 16 - 17, 2026
+                - generic [ref=e64]: Benidorm, Spain
+              - heading "La Nucia/Benidorm European Open 2026" [level=1] [ref=e66]
+              - paragraph [ref=e67]: 39 nations / 450 judoka
+              - img "La Nucia/Benidorm European Open 2026" [ref=e69]
+            - generic [ref=e70]:
+              - generic [ref=e71]:
+                - region "Video Player" [ref=e76]:
+                  - button "Play Video" [ref=e78] [cursor=pointer]:
+                    - text: 
+                    - generic [ref=e79]: Play Video
+                  - text:               
+                - generic [ref=e80]:
+                  - button "Front" [ref=e82] [cursor=pointer]:
+                    - generic [ref=e84]: Front
+                  - button "Rear" [ref=e86] [cursor=pointer]:
+                    - generic [ref=e88]: Rear
+              - generic [ref=e89]:
+                - generic [ref=e90]:
+                  - generic [ref=e91]:
+                    - generic [ref=e92]:
+                      - generic [ref=e93]: Tatami
+                      - generic [ref=e95]: "4"
+                    - generic [ref=e96]: "-60 kg / #23"
+                  - generic [ref=e100]:
+                    - generic [ref=e101]:
+                      - generic [ref=e103]:
+                        - img [ref=e105]
+                        - generic [ref=e106]: ISR
+                      - generic [ref=e107]:
+                        - link "Yehonatan VEKSLER":
+                          - /url: /competitions/cont_open_esp2026/judoka/50689
+                          - img "Yehonatan VEKSLER"
+                      - link "Yehonatan VEKSLER" [ref=e110] [cursor=pointer]:
+                        - /url: /competitions/cont_open_esp2026/judoka/50689
+                    - generic [ref=e111]:
+                      - generic [ref=e113]:
+                        - img [ref=e115]
+                        - generic [ref=e116]: KAZ
+                      - generic [ref=e117]:
+                        - link "Aldiyar KARGULOV":
+                          - /url: /competitions/cont_open_esp2026/judoka/63734
+                          - img "Aldiyar KARGULOV"
+                      - link "Aldiyar KARGULOV" [ref=e120] [cursor=pointer]:
+                        - /url: /competitions/cont_open_esp2026/judoka/63734
+                    - generic [ref=e122]:
+                      - generic "Ippon" [ref=e123]: I
+                      - generic "Waza-ari" [ref=e124]: W
+                      - generic "Yuko" [ref=e125]: "Y"
+                      - generic "Penalty" [ref=e126]: P
+                      - generic "Ippon" [ref=e127]
+                      - generic "Waza-ari" [ref=e128]
+                      - generic "Yuko" [ref=e129]: "1"
+                      - generic "Penalty" [ref=e130]
+                    - generic [ref=e132]:
+                      - generic [ref=e133]: Round of 16
+                      - generic [ref=e135]: 04:00
+                    - generic [ref=e137]:
+                      - generic "Ippon" [ref=e138]: I
+                      - generic "Waza-ari" [ref=e139]: W
+                      - generic "Yuko" [ref=e140]: "Y"
+                      - generic "Penalty" [ref=e141]: P
+                      - generic "Ippon" [ref=e142]
+                      - generic "Waza-ari" [ref=e143]
+                      - generic "Yuko" [ref=e144]: "0"
+                      - generic "Penalty" [ref=e145]
+                  - generic [ref=e149]:
+                    - button "Add to Favourites" [ref=e151] [cursor=pointer]:
+                      - generic [ref=e154]: Add to Favourites
+                    - button [ref=e156] [cursor=pointer]
+                    - button "Add to Favourites" [ref=e160] [cursor=pointer]:
+                      - generic [ref=e163]: Add to Favourites
+                - generic [ref=e164]:
+                  - generic [ref=e167]: 01:13
+                  - button "Shido" [ref=e170] [cursor=pointer]:
+                    - heading "Shido" [level=4] [ref=e171]
+                  - button "Shido" [ref=e174] [cursor=pointer]:
+                    - heading "Shido" [level=4] [ref=e175]
+                  - generic [ref=e177]: 03:10
+                  - button "Yuko" [ref=e181] [cursor=pointer]:
+                    - heading "Yuko" [level=4] [ref=e182]
+                  - generic [ref=e184]: 03:36
+            - generic [ref=e187]:
+              - generic [ref=e188]:
+                - generic [ref=e190]:
+                  - generic [ref=e192]:
+                    - generic [ref=e193]: "#87"
+                    - generic [ref=e194]: WRL
+                  - generic [ref=e195]:
+                    - img [ref=e197]
+                    - generic [ref=e198]: ISR
+                  - generic [ref=e199]:
+                    - img "Yehonatan VEKSLER"
+                    - link [ref=e200] [cursor=pointer]:
+                      - /url: /competitions/cont_open_esp2026/judoka/50689
+                  - generic [ref=e201]:
+                    - generic [ref=e202]:
+                      - link "Yehonatan VEKSLER" [ref=e204] [cursor=pointer]:
+                        - /url: /competitions/cont_open_esp2026/judoka/50689
+                      - text: (m)
+                    - generic [ref=e205]:
+                      - text: Seniors
+                      - text: "-60 kg (Extra-lightweight)"
+                - generic [ref=e209]:
+                  - generic [ref=e211]:
+                    - heading "Contests in this competition" [level=3] [ref=e212]
+                    - heading "4 contests" [level=4] [ref=e213]:
+                      - strong [ref=e214]: "4"
+                      - text: contests
+                  - generic [ref=e216]:
+                    - generic [ref=e217]:
+                      - generic [ref=e218]:
+                        - generic [ref=e219]:
+                          - generic [ref=e220]:
+                            - generic [ref=e221]: Tatami
+                            - generic [ref=e223]: "2"
+                          - generic [ref=e224]: Final
+                          - generic [ref=e226]: "-60 kg / #35"
+                        - link "Replay" [ref=e227] [cursor=pointer]:
+                          - /url: /competitions/cont_open_esp2026/contests/cont_open_esp2026_0001_m_0060_0035
+                          - generic [ref=e230]: Replay
+                      - generic [ref=e232]:
+                        - generic [ref=e233]:
+                          - generic [ref=e235]:
+                            - generic [ref=e236]:
+                              - generic [ref=e237]: BEL
+                              - img [ref=e239]
+                            - link "Olivier NAERT" [ref=e241] [cursor=pointer]:
+                              - /url: /competitions/cont_open_esp2026/judoka/58321
+                          - generic [ref=e242]:
+                            - generic "Ippon" [ref=e243]: "1"
+                            - generic "Waza-ari" [ref=e244]: "0"
+                            - generic "Yuko" [ref=e245]: "0"
+                            - generic "Penalty" [ref=e246]
+                        - generic [ref=e248]:
+                          - generic [ref=e250]:
+                            - generic [ref=e251]:
+                              - generic [ref=e252]: ISR
+                              - img [ref=e254]
+                            - link "Yehonatan VEKSLER" [ref=e256] [cursor=pointer]:
+                              - /url: /competitions/cont_open_esp2026/judoka/50689
+                          - generic [ref=e257]:
+                            - generic "Ippon" [ref=e258]
+                            - generic "Waza-ari" [ref=e259]
+                            - generic "Yuko" [ref=e260]: "0"
+                            - generic "Penalty" [ref=e261]
+                    - generic [ref=e262]:
+                      - generic [ref=e263]:
+                        - generic [ref=e264]:
+                          - generic [ref=e265]:
+                            - generic [ref=e266]: Tatami
+                            - generic [ref=e268]: "4"
+                          - generic [ref=e269]: Semi-Final
+                          - generic [ref=e271]: "-60 kg / #32"
+                        - link "Replay" [ref=e272] [cursor=pointer]:
+                          - /url: /competitions/cont_open_esp2026/contests/cont_open_esp2026_0001_m_0060_0032
+                          - generic [ref=e275]: Replay
+                      - generic [ref=e277]:
+                        - generic [ref=e278]:
+                          - generic [ref=e280]:
+                            - generic [ref=e281]:
+                              - generic [ref=e282]: ITA
+                              - img [ref=e284]
+                            - link "Pietro ANDREINI" [ref=e286] [cursor=pointer]:
+                              - /url: /competitions/cont_open_esp2026/judoka/49772
+                          - generic [ref=e287]:
+                            - generic "Ippon" [ref=e288]
+                            - generic "Waza-ari" [ref=e289]
+                            - generic "Yuko" [ref=e290]: "0"
+                            - generic "Penalty" [ref=e291]
+                        - generic [ref=e293]:
+                          - generic [ref=e295]:
+                            - generic [ref=e296]:
+                              - generic [ref=e297]: ISR
+                              - img [ref=e299]
+                            - link "Yehonatan VEKSLER" [ref=e301] [cursor=pointer]:
+                              - /url: /competitions/cont_open_esp2026/judoka/50689
+                          - generic [ref=e302]:
+                            - generic "Ippon" [ref=e303]: "1"
+                            - generic "Waza-ari" [ref=e304]: "0"
+                            - generic "Yuko" [ref=e305]: "0"
+                            - generic "Penalty" [ref=e306]
+                    - generic [ref=e307]:
+                      - generic [ref=e308]:
+                        - generic [ref=e309]:
+                          - generic [ref=e310]:
+                            - generic [ref=e311]: Tatami
+                            - generic [ref=e313]: "4"
+                          - generic [ref=e314]: Quarter-Final
+                          - generic [ref=e316]: "-60 kg / #28"
+                        - link "Replay" [ref=e317] [cursor=pointer]:
+                          - /url: /competitions/cont_open_esp2026/contests/cont_open_esp2026_0001_m_0060_0028
+                          - generic [ref=e320]: Replay
+                      - generic [ref=e322]:
+                        - generic [ref=e323]:
+                          - generic [ref=e325]:
+                            - generic [ref=e326]:
+                              - generic [ref=e327]: ISR
+                              - img [ref=e329]
+                            - link "Yehonatan VEKSLER" [ref=e331] [cursor=pointer]:
+                              - /url: /competitions/cont_open_esp2026/judoka/50689
+                          - generic [ref=e332]:
+                            - generic "Ippon" [ref=e333]: "1"
+                            - generic "Waza-ari" [ref=e334]: "0"
+                            - generic "Yuko" [ref=e335]: "0"
+                            - generic "Penalty" [ref=e336]
+                        - generic [ref=e338]:
+                          - generic [ref=e340]:
+                            - generic [ref=e341]:
+                              - generic [ref=e342]: ISR
+                              - img [ref=e344]
+                            - link "Roie ROSEN" [ref=e346] [cursor=pointer]:
+                              - /url: /competitions/cont_open_esp2026/judoka/29529
+                          - generic [ref=e347]:
+                            - generic "Ippon" [ref=e348]
+                            - generic "Waza-ari" [ref=e349]
+                            - generic "Yuko" [ref=e350]: "0"
+                            - generic "Penalty" [ref=e351]
+                    - generic [ref=e352]:
+                      - generic [ref=e353]:
+                        - generic [ref=e354]:
+                          - generic [ref=e355]:
+                            - generic [ref=e356]: Tatami
+                            - generic [ref=e358]: "4"
+                          - generic [ref=e359]: Round of 16
+                          - generic [ref=e361]: "-60 kg / #23"
+                        - link "Current" [ref=e362] [cursor=pointer]:
+                          - /url: /competitions/cont_open_esp2026/contests/cont_open_esp2026_0001_m_0060_0023
+                          - generic [ref=e365]: Current
+                      - generic [ref=e367]:
+                        - generic [ref=e368]:
+                          - generic [ref=e370]:
+                            - generic [ref=e371]:
+                              - generic [ref=e372]: ISR
+                              - img [ref=e374]
+                            - link "Yehonatan VEKSLER" [ref=e376] [cursor=pointer]:
+                              - /url: /competitions/cont_open_esp2026/judoka/50689
+                          - generic [ref=e377]:
+                            - generic "Ippon" [ref=e378]
+                            - generic "Waza-ari" [ref=e379]
+                            - generic "Yuko" [ref=e380]: "1"
+                            - generic "Penalty" [ref=e381]
+                        - generic [ref=e383]:
+                          - generic [ref=e385]:
+                            - generic [ref=e386]:
+                              - generic [ref=e387]: KAZ
+                              - img [ref=e389]
+                            - link "Aldiyar KARGULOV" [ref=e391] [cursor=pointer]:
+                              - /url: /competitions/cont_open_esp2026/judoka/63734
+                          - generic [ref=e392]:
+                            - generic "Ippon" [ref=e393]
+                            - generic "Waza-ari" [ref=e394]
+                            - generic "Yuko" [ref=e395]: "0"
+                            - generic "Penalty" [ref=e396]
+              - generic [ref=e398]:
+                - generic [ref=e400]:
+                  - generic [ref=e402]:
+                    - generic [ref=e403]: "#273"
+                    - generic [ref=e404]: WRL
+                  - generic [ref=e405]:
+                    - img [ref=e407]
+                    - generic [ref=e408]: KAZ
+                  - generic [ref=e409]:
+                    - img "Aldiyar KARGULOV"
+                    - link [ref=e410] [cursor=pointer]:
+                      - /url: /competitions/cont_open_esp2026/judoka/63734
+                  - generic [ref=e411]:
+                    - generic [ref=e412]:
+                      - link "Aldiyar KARGULOV" [ref=e414] [cursor=pointer]:
+                        - /url: /competitions/cont_open_esp2026/judoka/63734
+                      - text: (m)
+                    - generic [ref=e415]:
+                      - text: Seniors
+                      - text: "-60 kg (Extra-lightweight)"
+                - generic [ref=e419]:
+                  - generic [ref=e421]:
+                    - heading "Contests in this competition" [level=3] [ref=e422]
+                    - heading "2 contests" [level=4] [ref=e423]:
+                      - strong [ref=e424]: "2"
+                      - text: contests
+                  - generic [ref=e426]:
+                    - generic [ref=e427]:
+                      - generic [ref=e428]:
+                        - generic [ref=e429]:
+                          - generic [ref=e430]:
+                            - generic [ref=e431]: Tatami
+                            - generic [ref=e433]: "4"
+                          - generic [ref=e434]: Round of 16
+                          - generic [ref=e436]: "-60 kg / #23"
+                        - link "Current" [ref=e437] [cursor=pointer]:
+                          - /url: /competitions/cont_open_esp2026/contests/cont_open_esp2026_0001_m_0060_0023
+                          - generic [ref=e440]: Current
+                      - generic [ref=e442]:
+                        - generic [ref=e443]:
+                          - generic [ref=e445]:
+                            - generic [ref=e446]:
+                              - generic [ref=e447]: ISR
+                              - img [ref=e449]
+                            - link "Yehonatan VEKSLER" [ref=e451] [cursor=pointer]:
+                              - /url: /competitions/cont_open_esp2026/judoka/50689
+                          - generic [ref=e452]:
+                            - generic "Ippon" [ref=e453]
+                            - generic "Waza-ari" [ref=e454]
+                            - generic "Yuko" [ref=e455]: "1"
+                            - generic "Penalty" [ref=e456]
+                        - generic [ref=e458]:
+                          - generic [ref=e460]:
+                            - generic [ref=e461]:
+                              - generic [ref=e462]: KAZ
+                              - img [ref=e464]
+                            - link "Aldiyar KARGULOV" [ref=e466] [cursor=pointer]:
+                              - /url: /competitions/cont_open_esp2026/judoka/63734
+                          - generic [ref=e467]:
+                            - generic "Ippon" [ref=e468]
+                            - generic "Waza-ari" [ref=e469]
+                            - generic "Yuko" [ref=e470]: "0"
+                            - generic "Penalty" [ref=e471]
+                    - generic [ref=e473]:
+                      - generic [ref=e474]:
+                        - generic [ref=e475]:
+                          - generic [ref=e476]:
+                            - generic [ref=e477]: Tatami
+                            - generic [ref=e479]: "4"
+                          - generic [ref=e480]: Round of 32
+                          - generic [ref=e482]: "-60 kg / #14"
+                        - link "Replay" [ref=e483] [cursor=pointer]:
+                          - /url: /competitions/cont_open_esp2026/contests/cont_open_esp2026_0001_m_0060_0014
+                          - generic [ref=e486]: Replay
+                      - generic [ref=e488]:
+                        - generic [ref=e489]:
+                          - generic [ref=e491]:
+                            - generic [ref=e492]:
+                              - generic [ref=e493]: ESP
+                              - img [ref=e495]
+                            - link "Javier LASSA IGLESIAS" [ref=e497] [cursor=pointer]:
+                              - /url: /competitions/cont_open_esp2026/judoka/20425
+                          - generic [ref=e498]:
+                            - generic "Ippon" [ref=e499]
+                            - generic "Waza-ari" [ref=e500]
+                            - generic "Yuko" [ref=e501]: "0"
+                            - generic "Penalty" [ref=e502]
+                        - generic [ref=e503]:
+                          - generic [ref=e505]:
+                            - generic [ref=e506]:
+                              - generic [ref=e507]: KAZ
+                              - img [ref=e509]
+                            - link "Aldiyar KARGULOV" [ref=e511] [cursor=pointer]:
+                              - /url: /competitions/cont_open_esp2026/judoka/63734
+                          - generic [ref=e512]:
+                            - generic "Ippon" [ref=e513]: "1"
+                            - generic "Waza-ari" [ref=e514]: "1"
+                            - generic "Yuko" [ref=e515]: "0"
+                            - generic "Penalty" [ref=e516]
+        - complementary [ref=e517]:
+          - link "JudoTV" [ref=e519] [cursor=pointer]:
+            - /url: /
+            - img "JudoTV" [ref=e520]
+          - navigation "Main navigation" [ref=e526]:
+            - link "Home" [ref=e527] [cursor=pointer]:
+              - /url: /
+              - img [ref=e528]
+              - generic [ref=e530]: Home
+            - link "Events" [ref=e531] [cursor=pointer]:
+              - /url: /competitions
+              - img [ref=e532]
+              - generic [ref=e535]: Events
+            - link "Videos" [ref=e536] [cursor=pointer]:
+              - /url: /videos
+              - img [ref=e537]
+              - generic [ref=e540]: Videos
+            - link "JudoPOD" [ref=e541] [cursor=pointer]:
+              - /url: /judo-pod
+              - img [ref=e542]
+              - generic [ref=e548]: JudoPOD
+            - link "Judoka" [ref=e549] [cursor=pointer]:
+              - /url: /judoka
+              - img [ref=e550]
+              - generic [ref=e553]: Judoka
+            - link "Prediction" [ref=e554] [cursor=pointer]:
+              - /url: /competitions/cont_open_alg2026/prediction
+              - img [ref=e555]
+              - generic [ref=e559]: Prediction
+          - button "Select color theme" [ref=e560] [cursor=pointer]:
+            - generic [ref=e563]: Auto color
+          - button "Select contrast mode" [ref=e564] [cursor=pointer]:
+            - generic [ref=e567]: Auto contrast
+          - generic [ref=e568]:
+            - button "Select language" [ref=e569] [cursor=pointer]:
+              - img [ref=e570]
+              - generic [ref=e574]: English
+              - generic [ref=e575]: EN
+            - button "Select your country" [ref=e577] [cursor=pointer]:
+              - img [ref=e578]
+              - generic [ref=e579]: Kazakhstan
+              - generic [ref=e580]: KAZ
+            - generic [ref=e582]: Gold
+      - contentinfo [ref=e583]:
+        - generic [ref=e586]:
+          - heading "Our partners" [level=4] [ref=e587]
+          - generic [ref=e588]:
+            - link "IMPULSE Health Tech" [ref=e589] [cursor=pointer]:
+              - /url: https://www.impulsehealthtech.com
+              - img "IMPULSE Health Tech" [ref=e590]
+            - link "MET Group" [ref=e601] [cursor=pointer]:
+              - /url: https://group.met.com/en
+              - img "MET Group" [ref=e602]
+            - link "TaiShan Sports" [ref=e613] [cursor=pointer]:
+              - /url: https://www.taishansports.cn
+              - img "TaiShan Sports" [ref=e614]
+            - link "OTP Group" [ref=e623] [cursor=pointer]:
+              - /url: https://www.otpbank.hu/portal/en/Retail
+              - img "OTP Group" [ref=e624]
+            - link "HARVEST GROUP SA" [ref=e637] [cursor=pointer]:
+              - /url: https://harvest-group.com
+              - img "HARVEST GROUP SA" [ref=e638]
+            - link [ref=e661] [cursor=pointer]:
+              - /url: http://cbhbank.com
+              - img [ref=e662]
+            - link [ref=e672] [cursor=pointer]:
+              - /url: https://iconacapital.com
+              - img [ref=e673]
+            - link "Millenium Team" [ref=e695] [cursor=pointer]:
+              - /url: https://millenniumteam.rs/en/
+              - img "Millenium Team" [ref=e696]
+            - link "Zebra" [ref=e703] [cursor=pointer]:
+              - /url: https://eu.zebraathletics.com
+              - img "Zebra" [ref=e704]
+        - generic [ref=e738]:
+          - generic [ref=e739]:
+            - link "International Judo Federation" [ref=e740] [cursor=pointer]:
+              - /url: https://ijf.org
+              - img "International Judo Federation" [ref=e741]
+            - generic [ref=e751]:
+              - text: © 2007 - 2026
+              - link "International Judo Federation" [ref=e752] [cursor=pointer]:
+                - /url: https://ijf.org
+              - text: All rights reserved
+          - navigation "Footer navigation" [ref=e753]:
+            - link "Cookie policy" [ref=e754] [cursor=pointer]:
+              - /url: https://judotv.com/cookie-policy
+            - link "Terms of use" [ref=e755] [cursor=pointer]:
+              - /url: https://www.ijf.org/page/terms_of_use-en
+            - link "Privacy notice" [ref=e756] [cursor=pointer]:
+              - /url: https://www.ijf.org/page/privacy-en
+            - link "Contact us" [ref=e757] [cursor=pointer]:
+              - /url: mailto:hello@judotv.com
+            - generic [ref=e758] [cursor=pointer]: Redeem NFT
+  - iframe [ref=e759]:
+    

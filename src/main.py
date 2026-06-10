@@ -59,6 +59,12 @@ class JudoAnalysisPipeline:
         Returns:
             Path to the analysis output directory
         """
+        video_name = Path(video_path).stem
+        analysis_dir = os.path.join(self.paths["analysis"], video_name)
+        existing_reports = list(Path(analysis_dir).glob("report_*.txt")) if os.path.exists(analysis_dir) else []
+        if existing_reports:
+            logger.info(f"Skipping {video_name} — already has analysis ({len(existing_reports)} report(s))")
+            return analysis_dir
         try:
             video_name = Path(video_path).stem
             video_output_dir = os.path.join(self.paths["frames"], video_name)
@@ -122,15 +128,22 @@ class JudoAnalysisPipeline:
         logger.info(f"Found {len(video_files)} video(s) to process")
 
         analysis_dirs = []
+        processed = 0
+        skipped = 0
 
         for video_file in video_files:
             try:
                 analysis_dir = self.process_video(video_file)
                 analysis_dirs.append(analysis_dir)
+                if Path(analysis_dir).glob("report_*.txt"):
+                    skipped += 1
+                else:
+                    processed += 1
             except Exception as e:
                 logger.error(f"Skipping {video_file} due to error: {str(e)}")
                 continue
 
+        logger.info(f"Processed: {processed}, Skipped (already done): {skipped}")
         return analysis_dirs
 
 

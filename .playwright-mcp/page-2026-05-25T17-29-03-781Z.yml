@@ -1,0 +1,123 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e4]:
+      - generic [ref=e6]: IJF ACCOUNT
+      - generic [ref=e7]: Log in
+      - generic [ref=e9]:
+        - textbox "Your email address" [ref=e10]: yernarkaz@gmail.com
+        - generic [ref=e11]: Email or password is incorrect.
+        - textbox "Your password" [ref=e13]
+        - button "Log in" [ref=e15] [cursor=pointer]
+      - generic [ref=e19]: OR
+      - button "Continue with Google" [ref=e21] [cursor=pointer]: Continue with Google
+      - button "Continue with Apple" [ref=e25] [cursor=pointer]:
+        - generic [ref=e26]:
+          - img:
+            - generic:
+              - img:
+                - generic:  Continue with Apple
+        - img [ref=e28]
+      - generic [ref=e31]:
+        - generic [ref=e32]:
+          - generic [ref=e33]: New here?
+          - link "Register →" [ref=e35] [cursor=pointer]:
+            - /url: /Account/Register
+        - generic [ref=e36]:
+          - generic [ref=e37]: Forgotten password?
+          - link "Manage →" [ref=e39] [cursor=pointer]:
+            - /url: /Account/ForgotPassword
+    - generic [ref=e40]:
+      - generic [ref=e41]: One account, many possibilities
+      - generic [ref=e44]:
+        - link "IJF.org" [ref=e45] [cursor=pointer]:
+          - /url: https://www.ijf.org/
+          - img [ref=e47]
+          - generic [ref=e48]: IJF.org
+        - link "JudoTv" [ref=e49] [cursor=pointer]:
+          - /url: https://judotv.com/
+          - img [ref=e51]
+          - generic [ref=e52]: JudoTv
+        - link "Judobase" [ref=e53] [cursor=pointer]:
+          - /url: https://judobase.ijf.org/
+          - img [ref=e55]
+          - generic [ref=e56]: Judobase
+        - link "Judo In Schools" [ref=e57] [cursor=pointer]:
+          - /url: https://schools.ijf.org/
+          - img [ref=e59]
+          - generic [ref=e60]: Judo In Schools
+        - link "Analyzer" [ref=e61] [cursor=pointer]:
+          - /url: https://tagger.ijf.org/
+          - img [ref=e63]
+          - generic [ref=e64]: Analyzer
+        - link "Account" [ref=e65] [cursor=pointer]:
+          - /url: https://account.ijf.org/
+          - img [ref=e67]
+          - generic [ref=e68]: Account
+        - link "Veterans" [ref=e69] [cursor=pointer]:
+          - /url: https://veterans.ijf.org/
+          - img [ref=e71]
+          - generic [ref=e72]: Veterans
+        - link "Admin" [ref=e73] [cursor=pointer]:
+          - /url: https://admin.judobase.org/
+          - img [ref=e75]
+          - generic [ref=e76]: Admin
+        - link "Travel" [ref=e77] [cursor=pointer]:
+          - /url: https://www.ijf.org/__travel_link
+          - img [ref=e79]
+          - generic [ref=e80]: Travel
+      - generic [ref=e82]: Our partners
+      - generic [ref=e85]:
+        - link [ref=e86] [cursor=pointer]:
+          - /url: https://iconacapital.com/
+          - img [ref=e88]
+        - link [ref=e89] [cursor=pointer]:
+          - /url: https://harvest-group.com/
+          - img [ref=e91]
+        - link [ref=e92] [cursor=pointer]:
+          - /url: https://www.otpbank.hu/portal/en/Home
+          - img [ref=e94]
+        - link [ref=e95] [cursor=pointer]:
+          - /url: https://group.met.com/
+          - img [ref=e97]
+        - link [ref=e98] [cursor=pointer]:
+          - /url: https://www.taishansports.cn/
+          - img [ref=e100]
+        - link [ref=e101] [cursor=pointer]:
+          - /url: https://judotv.com
+          - img [ref=e103]
+        - link [ref=e104] [cursor=pointer]:
+          - /url: https://www.ijf.org/__travel_link
+          - img [ref=e106]
+        - link [ref=e107] [cursor=pointer]:
+          - /url: https://cbhbank.com/
+          - img [ref=e109]
+        - link [ref=e110] [cursor=pointer]:
+          - /url: https://eng.impulsefitness.com/
+          - img [ref=e112]
+        - link [ref=e113] [cursor=pointer]:
+          - /url: https://ijf.org
+          - img [ref=e115]
+    - generic [ref=e116]:
+      - generic [ref=e118]:
+        - text: © 2007-2026
+        - text: International Judo Federation
+        - text: All rights reserved
+      - table [ref=e120]:
+        - rowgroup [ref=e121]:
+          - row "Cookie settings Terms & Condititons" [ref=e122]:
+            - cell "Cookie settings" [ref=e123]:
+              - link "Cookie settings" [ref=e124] [cursor=pointer]:
+                - /url: https://www.ijf.org/cookies
+            - cell "Terms & Condititons" [ref=e125]:
+              - link "Terms & Condititons" [ref=e126] [cursor=pointer]:
+                - /url: https://www.ijf.org/page/legal
+          - row "Privacy policy How to use judo tv" [ref=e127]:
+            - cell "Privacy policy" [ref=e128]:
+              - link "Privacy policy" [ref=e129] [cursor=pointer]:
+                - /url: https://www.ijf.org/page/legal
+            - cell "How to use judo tv" [ref=e130]:
+              - link "How to use judo tv" [ref=e131] [cursor=pointer]:
+                - /url: "#"
+  - generic [ref=e133]:
+    - generic [ref=e135]: x
+    - generic [ref=e136]: Login was not successful.
