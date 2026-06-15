@@ -1,5 +1,5 @@
 """
-Judo match analyzer using GPT-4o Vision.
+Judo match analyzer using llama.cpp (OpenAI-compatible) vision model.
 
 Multi-pass analysis:
   Pass 1 — Moment detection: identify key judo moments from frames
@@ -7,15 +7,20 @@ Multi-pass analysis:
   Pass 3 — Match summary: overall strategic assessment and training recommendations
 """
 
-import os
-import time
-import base64
+import dataclasses
+import io
 import json
 import logging
+import os
+import re
+import time
+import base64
 from pathlib import Path
 from typing import List, Dict, Any, Optional
+
 import requests
 from dotenv import load_dotenv
+from PIL import Image
 
 from src.video_processing.frame_extractor import FrameInfo
 from src.models.schemas import (
@@ -99,23 +104,20 @@ Respond ONLY with valid JSON:
 
 
 class JudoAnalyzer:
-    def __init__(self, model: str = None, base_url: str = None):
+    def __init__(self, model: Optional[str] = None, base_url: Optional[str] = None):
         """
-        Initialize the Judo Analyzer with Ollama (local qwen2.5vl).
+        Initialize the Judo Analyzer with llama.cpp (OpenAI-compatible) vision model.
 
         Args:
-            model: Ollama model name (defaults to OLLAMA_MODEL env var or qwen2.5vl:7b)
-            base_url: Ollama base URL (defaults to OLLAMA_BASE_URL env var)
+            model: Model name (defaults to VISION_MODEL env var or qwen2.5vl)
+            base_url: llama.cpp server base URL (defaults to VISION_BASE_URL env var)
         """
-        self.base_url = (base_url or os.getenv("OLLAMA_BASE_URL", "http://127.0.0.1:11434")).rstrip("/")
-        self.model = model or os.getenv("OLLAMA_MODEL", "qwen2.5vl:7b")
-        logger.info(f"JudoAnalyzer initialized with Ollama model: {self.model} @ {self.base_url}")
+        self.base_url = (base_url or os.getenv("VISION_BASE_URL", "http://192.168.2.114:8080")).rstrip("/")
+        self.model = model or os.getenv("VISION_MODEL", "qwen2.5vl")
+        logger.info(f"JudoAnalyzer initialized with llama.cpp model: {self.model} @ {self.base_url}")
 
     def _encode_image(self, image_path: str, max_dim: int = 512) -> str:
-        """Encode image to base64, resized to reduce VRAM usage."""
-        from PIL import Image
-        import io
-
+        """Encode image to base64 for OpenAI-compatible vision API. Resized to reduce VRAM usage."""
         img = Image.open(image_path)
         if max(img.size) > max_dim:
             img.thumbnail((max_dim, max_dim), Image.Resampling.LANCZOS)
@@ -126,44 +128,58 @@ class JudoAnalyzer:
     def _build_vision_messages(
         self, system_prompt: str, frames: List[FrameInfo], user_text: str = ""
     ) -> List[Dict]:
-        """Build messages with images for Ollama Vision API."""
-        # Ollama expects: content as text, images as separate base64 array
+        """Build messages with images for OpenAI-compatible (llama.cpp) Vision API."""
+        # OpenAI-compatible format: images embedded as content parts in the user message
         text_parts = []
-        images = []
 
         if user_text:
             text_parts.append(user_text)
 
         for i, frame in enumerate(frames):
             text_parts.append(f"[Image {i} - Frame at {frame.timestamp_sec:.1f}s]")
-            images.append(self._encode_image(frame.path))
+
+        user_content: List[Dict[str, Any]] = [{"type": "text", "text": "\n".join(text_parts)}]
+        for frame in frames:
+            b64_data = self._encode_image(frame.path)
+            user_content.append({
+                "type": "image_url",
+                "image_url": {"url": f"data:image/jpeg;base64,{b64_data}"},
+            })
 
         return [
             {"role": "system", "content": system_prompt},
-            {"role": "user", "content": "\n".join(text_parts), "images": images},
+            {"role": "user", "content": user_content},
         ]
 
     def _call_vision(
         self, messages: List[Dict], max_tokens: int = 2000, max_retries: int = 5
     ) -> str:
-        """Call Ollama chat API with exponential backoff retry."""
+        """Call llama.cpp (OpenAI-compatible) chat API with exponential backoff retry."""
+        api_key = os.getenv("VISION_API_KEY", "")
+        headers = {"Content-Type": "application/json"}
+        if api_key:
+            headers["Authorization"] = f"Bearer {api_key}"
+
         for attempt in range(max_retries):
             try:
                 response = requests.post(
-                    f"{self.base_url}/api/chat",
+                    f"{self.base_url}/v1/chat/completions",
+                    headers=headers,
                     json={
                         "model": self.model,
                         "messages": messages,
-                        "options": {
-                            "num_predict": max_tokens,
-                            "temperature": 0.3,
-                        },
-                        "stream": False,
+                        "max_tokens": max_tokens,
+                        "temperature": 0.3,
                     },
                     timeout=300,
                 )
                 response.raise_for_status()
-                return response.json()["message"]["content"]
+                try:
+                    body = response.json()
+                    return body["choices"][0]["message"]["content"]
+                except (json.JSONDecodeError, KeyError, IndexError) as e:
+                    logger.error(f"Unexpected response format: {response.text[:500]}")
+                    raise RuntimeError(f"Invalid API response: {e}") from e
             except requests.exceptions.RequestException as e:
                 if attempt < max_retries - 1:
                     wait = min(2 ** attempt * 5, 300)
@@ -171,7 +187,7 @@ class JudoAnalyzer:
                     time.sleep(wait)
                 else:
                     raise
-        raise RuntimeError(f"Ollama API failed after {max_retries} retries")
+        raise RuntimeError(f"llama.cpp API failed after {max_retries} retries")
 
     def _parse_json_response(self, text: str, expected_key: str = "moments") -> Dict:
         """Extract and parse JSON from the model response. Handles truncated/ malformed output."""
@@ -206,7 +222,6 @@ class JudoAnalyzer:
                         candidate = text[brace_start:end_pos].strip()
                         if candidate.endswith("}"):
                             # Fix trailing commas before closing braces
-                            import re
                             candidate = re.sub(r',\s*([}\]])', r'\1', candidate)
                             try:
                                 return json.loads(candidate)
@@ -224,7 +239,7 @@ class JudoAnalyzer:
         """
         logger.info(f"Pass 1: Detecting moments from {len(frames)} frames...")
 
-        # Send frames in small batches - qwen2.5vl handles ~5 images max per request
+        # Send frames in small batches - qwen2.5vl handles ~5 images max per request (llama.cpp)
         batch_size = 5
         all_moments = []
 
@@ -355,8 +370,6 @@ class JudoAnalyzer:
         Pass 3: Generate overall match summary and training recommendations.
         """
         logger.info("Pass 3: Generating match summary and training recommendations...")
-
-        import dataclasses
 
         # Truncate to avoid context overflow — keep only essential fields
         moments_summary = [

@@ -23,8 +23,8 @@ def load_config() -> dict:
         "max_frames": int(os.getenv("FRAME_EXTRACTION_MAX_FRAMES", "50")),
         "scene_change_threshold": float(os.getenv("SCENE_CHANGE_THRESHOLD", "30")),
         "motion_threshold": float(os.getenv("MOTION_THRESHOLD", "15")),
-        "ollama_model": os.getenv("OLLAMA_MODEL", "qwen2.5vl:7b"),
-        "ollama_base_url": os.getenv("OLLAMA_BASE_URL", "http://127.0.0.1:11434"),
+        "vision_model": os.getenv("VISION_MODEL", "qwen2.5vl"),
+        "vision_base_url": os.getenv("VISION_BASE_URL", "http://192.168.2.114:8080"),
         "output_dir": os.getenv("OUTPUT_DIR", "output"),
     }
 
