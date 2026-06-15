@@ -1,9 +1,10 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "plugin": [
-    "opencode-anthropic-auth@latest",
     "opencode-copilot-auth@latest"
   ],
+
+  "default_agent": "ml-orchestrator",
   "share": "disabled",
   "mcp": {
     "context7": {
@@ -37,7 +38,7 @@
             "field": "reasoning_content"
           },
           "limit": {
-            "context": 100000,
+            "context": 105000,
             "output": 32000
           },
           "temperature": true,
@@ -73,5 +74,79 @@
     }
   },
   "model": "llama.cpp/qwen3.6-27b",
-  "small_model": "llama.cpp/qwen3.6-27b"
+  "small_model": "llama.cpp/qwen3.6-27b",
+  "snapshot": false,
+
+  "instructions": [],
+
+  "formatter": {
+    "ruff-format": {
+      "command": ["ruff", "format", "$FILE"],
+      "extensions": [".py", ".pyi"]
+    },
+    "ruff-check": {
+      "command": ["ruff", "check", "--fix", "$FILE"],
+      "extensions": [".py", ".pyi"]
+    }
+  },
+  "permission": {
+    "bash": {
+      "*": "allow",
+      "rm *": "ask",
+      "git push *": "ask",
+      "git reset *": "ask",
+      "pip install *": "ask",
+      "conda install *": "ask",
+      "poetry add *": "ask",
+      "az ml *": "ask"
+    },
+    "external_directory": {
+      "~/datasets/**": "allow",
+      "/data/**": "allow",
+      "/tmp/**": "allow",
+      "/dbfs/**": "allow"
+    },
+    "doom_loop": "allow"
+  },
+
+  "compaction": {
+    "auto": true,
+    "prune": true,
+    "reserved": 12000
+  },
+
+  "watcher": {
+    "ignore": [
+      "mlruns/**",
+      "lightning_logs/**",
+      "wandb/**",
+      "*.ckpt",
+      "*.pt",
+      "*.pth",
+      "*.h5",
+      "*.onnx",
+      "*.safetensors",
+      ".ipynb_checkpoints/**",
+      "data/raw/**",
+      "data/processed/**",
+      "outputs/**",
+      ".venv/**",
+      "__pycache__/**",
+      ".mypy_cache/**",
+      ".pytest_cache/**",
+      "*.parquet",
+      "*.pkl"
+    ]
+  },
+
+  "lsp": {
+    "mypy": {
+      "command": ["uv", "run", "pylsp"],
+      "extensions": [".py", ".pyi"]
+    },
+    "ruff": {
+      "command": ["uv", "run", "ruff", "server"],
+      "extensions": [".py", ".pyi"]
+    }
+  }
 }
