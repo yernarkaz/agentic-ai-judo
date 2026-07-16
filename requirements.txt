@@ -1,28 +1,12 @@
-# Core dependencies
-openai>=1.0.0
-anthropic>=0.20.0
-langchain
-langgraph
-pydantic>=2.0
-numpy>=1.24.0
-
 # Computer vision and video processing
 opencv-python>=4.8.0
 mediapipe>=0.10.0
-moviepy>=1.0.3
-ffmpeg-python>=0.2.0
+numpy>=1.24.0
 
 # Selenium for web scraping
 selenium>=4.15.0
 webdriver-manager>=4.0.0
 
-# HTTP requests
-requests>=2.31.0
-
 # Testing
 pytest>=7.4.0
 pytest-asyncio>=0.21.0
-
-# Utilities
-python-dotenv>=1.0.0
-

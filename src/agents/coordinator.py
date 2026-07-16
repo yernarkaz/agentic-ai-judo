@@ -88,6 +88,7 @@ class CoordinatorAgent(BaseAgent):
         }
 
         # Step 1: Load video (if URL)
+        video_url = video_source
         if input_type == "url":
             loader_result = self.agents["video_loader"].process({
                 "url": video_source
@@ -98,36 +99,39 @@ class CoordinatorAgent(BaseAgent):
                 result["error"] = "No videos found"
                 return result
 
-            # Use first video for analysis
             video_info = loader_result["videos"][0]
-            video_url = video_info.get("video_url", video_source)
-        else:
-            video_url = video_source
+            # Prefer local path (downloaded) over remote URL
+            video_url = video_info.get("local_path") or video_info.get("video_url", video_source)
 
-        # Step 2: Analyze video
+        # Step 2: Extract frames (needed for all analysis types)
         video_result = self.agents["video_analyzer"].process({
             "video_path": video_url,
             "action": "extract_frames",
         })
         result["agents"]["video_analyzer"] = video_result
 
-        # Step 3: Analyze poses
-        pose_result = self.agents["pose_analyzer"].process({
-            "frames": video_result.get("frames", []),
-        })
-        result["agents"]["pose_analyzer"] = pose_result
+        # Step 3: Pose analysis (needed for "pose", "technique", "strategy", "full")
+        if analysis_type in ("pose", "full"):
+            pose_result = self.agents["pose_analyzer"].process({
+                "frames": video_result.get("frames", []),
+            })
+            result["agents"]["pose_analyzer"] = pose_result
 
-        # Step 4: Recognize techniques
-        technique_result = self.agents["technique_analyzer"].process({
-            "techniques": [pose_result],
-        })
-        result["agents"]["technique_analyzer"] = technique_result
+        # Step 4: Technique recognition (needs pose data)
+        if analysis_type in ("technique", "full"):
+            pose_result = result.get("agents", {}).get("pose_analyzer", {})
+            technique_result = self.agents["technique_analyzer"].process({
+                "techniques": [pose_result],
+            })
+            result["agents"]["technique_analyzer"] = technique_result
 
-        # Step 5: Analyze strategy
-        strategy_result = self.agents["strategy_analyzer"].process({
-            "techniques": technique_result.get("sequence", []),
-        })
-        result["agents"]["strategy_analyzer"] = strategy_result
+        # Step 5: Strategy analysis (needs technique data)
+        if analysis_type in ("strategy", "full"):
+            technique_result = result.get("agents", {}).get("technique_analyzer", {})
+            strategy_result = self.agents["strategy_analyzer"].process({
+                "techniques": technique_result.get("sequence", []),
+            })
+            result["agents"]["strategy_analyzer"] = strategy_result
 
         # Generate synthesis
         result["synthesis"] = self._generate_synthesis(result)
@@ -222,6 +226,7 @@ class CoordinatorAgent(BaseAgent):
         self,
         video_source: str,
         input_type: str = "url",
+        analysis_type: str = "full",
     ) -> Dict[str, Any]:
         """
         Run a complete video analysis.
@@ -229,12 +234,13 @@ class CoordinatorAgent(BaseAgent):
         Args:
             video_source: Video URL or file path
             input_type: Type of input ("url" or "path")
+            analysis_type: Type of analysis ("full", "pose", "technique", "strategy")
 
         Returns:
             Dictionary with full analysis results
         """
         return self.analyze_video(
             video_source,
-            analysis_type="full",
+            analysis_type=analysis_type,
             input_type=input_type,
         )

@@ -74,6 +74,8 @@ def save_results(
     output_dir: str,
     video_source: str,
     output_format: str = "both",
+    verbose: bool = False,
+    analysis_type: str = "full",
 ) -> None:
     """
     Save analysis results to files.
@@ -83,6 +85,8 @@ def save_results(
         output_dir: Output directory path
         video_source: Source of the video
         output_format: Format to save ("json", "text", or "both")
+        verbose: Whether to print save confirmations
+        analysis_type: Type of analysis performed
     """
     # Generate filename from video source
     if video_source.startswith("https://"):
@@ -99,7 +103,7 @@ def save_results(
         json_path = os.path.join(output_dir, f"{video_id}_analysis.json")
         with open(json_path, "w") as f:
             json.dump(results, f, indent=2, default=str)
-        if args.verbose:
+        if verbose:
             print(f"JSON results saved to: {json_path}")
 
     # Save text report
@@ -111,7 +115,7 @@ def save_results(
             f.write("=" * 60 + "\n\n")
 
             f.write(f"Video Source: {video_source}\n")
-            f.write(f"Analysis Type: {args.analysis_type}\n")
+            f.write(f"Analysis Type: {analysis_type}\n")
             f.write(f"Timestamp: {results.get('timestamp', '')}\n\n")
 
             # Write synthesis
@@ -147,13 +151,12 @@ def save_results(
                 if len(result_str) > 5000:
                     f.write("\n... (truncated)")
 
-        if args.verbose:
+        if verbose:
             print(f"Text report saved to: {text_path}")
 
 
 def main():
     """Main entry point."""
-    global args
     args = parse_args()
 
     # Load configuration if provided
@@ -184,10 +187,15 @@ def main():
             print(f"Analysis type: {args.analysis_type}")
             print(f"Output directory: {args.output}")
 
-        results = coordinator.run_full_analysis(video_source, input_type)
+        results = coordinator.run_full_analysis(
+            video_source, input_type, args.analysis_type
+        )
 
         # Save results
-        save_results(results, args.output, video_source, args.format)
+        save_results(
+            results, args.output, video_source, args.format,
+            verbose=args.verbose, analysis_type=args.analysis_type,
+        )
 
         # Print summary
         print("\n" + "=" * 60)

@@ -2,8 +2,8 @@
 
 import os
 import cv2
+import base64
 from typing import List, Dict, Any, Optional
-from pathlib import Path
 
 from .base import BaseAgent
 

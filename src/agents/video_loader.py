@@ -1,6 +1,8 @@
 """Video Loader Agent that uses Selenium to fetch videos from judo.tv."""
 
 from typing import List, Dict, Any, Optional
+from urllib.parse import urlparse
+from urllib.request import urlretrieve
 import os
 
 from .base import BaseAgent
@@ -19,10 +21,12 @@ class VideoLoaderAgent(BaseAgent):
                 - website: The website to load videos from (default: "judo.tv")
                 - headless: Whether to run browser in headless mode
                 - search_queries: List of search terms to use
+                - download_dir: Directory to save downloaded videos
         """
         super().__init__("VideoLoaderAgent", config)
         self.selenium: Optional[SeleniumWrapper] = None
         self.downloaded_videos: List[Dict[str, Any]] = []
+        self.download_dir = self.config.get("download_dir", "data/input")
 
     def initialize(self) -> None:
         """Initialize the Selenium wrapper."""
@@ -30,16 +34,38 @@ class VideoLoaderAgent(BaseAgent):
         headless = self.config.get("headless", True)
         self.selenium = SeleniumWrapper(headless=headless)
         self.selenium.initialize()
+        os.makedirs(self.download_dir, exist_ok=True)
+
+    def download_video(self, video_url: str) -> Optional[str]:
+        """
+        Download a video from a URL to the download directory.
+
+        Args:
+            video_url: URL of the video file
+
+        Returns:
+            Local file path, or None on failure
+        """
+        try:
+            parsed = urlparse(video_url)
+            name = os.path.basename(parsed.path) or parsed.path.split("/")[-1]
+            if not name or "." not in name:
+                name = "video.mp4"
+            local_path = os.path.join(self.download_dir, name)
+            urlretrieve(video_url, local_path)  # ponytail: blocks on large files, threaded download if needed
+            return local_path
+        except Exception:
+            return None
 
     def load_videos_from_url(self, url: str) -> List[Dict[str, Any]]:
         """
-        Load videos from a specific judo.tv URL.
+        Load and download videos from a specific judo.tv URL.
 
         Args:
             url: The URL to load videos from
 
         Returns:
-            List of video information dictionaries
+            List of video information dictionaries with local file paths
         """
         if not self.selenium:
             raise RuntimeError("Agent not initialized. Call initialize() first.")
@@ -50,6 +76,13 @@ class VideoLoaderAgent(BaseAgent):
         for video_url in video_urls:
             info = self.selenium.extract_video_info(video_url)
             info["source_url"] = video_url
+
+            # If a direct video URL was found, download it
+            if info.get("video_url"):
+                local_path = self.download_video(info["video_url"])
+                if local_path:
+                    info["local_path"] = local_path
+
             videos.append(info)
 
         self.downloaded_videos.extend(videos)
